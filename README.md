@@ -1,98 +1,104 @@
-# CRM Frontend Project Spec
+<div align="center">
+
+<br/>
+
+```
+██████╗  ██████╗ ███████╗████████╗██████╗  █████╗     ██╗    ██╗███████╗██████╗
+██╔══██╗██╔═══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗    ██║    ██║██╔════╝██╔══██╗
+██║  ██║██║   ██║███████╗   ██║   ██████╔╝███████║    ██║ █╗ ██║█████╗  ██████╔╝
+██║  ██║██║   ██║╚════██║   ██║   ██╔══██╗██╔══██║    ██║███╗██║██╔══╝  ██╔══██╗
+██████╔╝╚██████╔╝███████║   ██║   ██║  ██║██║  ██║    ╚███╔███╔╝███████╗██████╔╝
+╚═════╝  ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝     ╚══╝╚══╝ ╚══════╝╚═════╝
+```
+
+*React + TypeScript CRM frontend for the Dostra system*
+
+<br/>
+
+[![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=flat-square&logo=reactquery&logoColor=white)](https://tanstack.com/query)
+[![Zod](https://img.shields.io/badge/Zod-3E67B1?style=flat-square)](https://zod.dev/)
+
+<br/>
+
+</div>
+
+---
 
 ## Overview
 
-Build a single React + Vite CRM frontend for two user roles:
+A single-page CRM frontend serving two distinct user roles — `admin` and `client` — built on a clean, layered React architecture. Consumes the `dostra-api` Laravel backend over REST.
 
-- `admin`: full access to all leads and full CRUD operations
-- `client`: access only to leads assigned to that client, with limited editing permissions
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000/api
+```
 
-The frontend will consume a Laravel/PHP backend over REST APIs. The main objective is to demonstrate solid frontend structure, role-based access control, responsive UI, and clean API integration for a small internship-scale dataset.
+> Copy `.env.example` to `.env` when setting up locally. Use `.env.local` for machine-specific overrides. Never commit secrets.
 
-## Recommended Frontend Stack
+---
 
-- React
-- Vite
-- TypeScript
-- React Router
-- TanStack Query for server state
-- Zustand or Context API for auth/session state
-- Tailwind CSS for fast, responsive UI
-- React Hook Form + Zod for forms and validation
+## Stack
 
-This stack is pragmatic for a small-to-medium frontend and keeps state concerns clear:
+| Concern | Library |
+|---------|---------|
+| **UI framework** | React + Vite + TypeScript |
+| **Routing** | React Router |
+| **Server state** | TanStack Query |
+| **Client state** | Zustand or Context API |
+| **Styling** | Tailwind CSS |
+| **Forms & validation** | React Hook Form + Zod |
 
-- auth/session state stays local
-- API data stays cached and synchronized through TanStack Query
-- forms remain predictable and easy to validate
+---
 
 ## User Roles
 
-### Admin
+### `admin`
+- Full CRUD over all leads
+- View all clients, users, and assignments
+- Access global dashboard metrics
+- Search, filter, sort, and paginate all records
 
-Permissions:
+### `client`
+- Read-only access to assigned leads
+- Edit restricted fields only: `notes` and `status`
+- View a dashboard scoped to their own leads
+- No access to other clients' data, lead creation, or deletion
 
-- View all leads
-- Create new leads
-- Edit any lead
-- Delete any lead
-- Search, filter, sort, and paginate all leads
-- View dashboard with global metrics
+> Frontend guards improve UX — backend authorisation is always the source of truth.
 
-### Client
+---
 
-Permissions:
+## Routes
 
-- View only leads assigned to them
-- Open lead detail pages for assigned leads only
-- Edit restricted fields on assigned leads:
-  - `notes`
-  - `status`
-- View a limited dashboard relevant to their own leads
+```
+/login                      public
 
-Not allowed:
+/dashboard                  protected — all roles
+/leads                      protected — all roles
+/leads/new                  protected — admin only
+/leads/:id                  protected — all roles (client: assigned only)
+/leads/:id/edit             protected — admin only
 
-- View other clients' leads
-- Create leads unless backend requirements later allow it
-- Delete leads
-- Edit protected lead fields like ownership or contact data unless explicitly allowed
+/profile                    optional
+/unauthorized               optional
+*                           not found
+```
 
-## Suggested Routes
+**Access rules:**
+- Unauthenticated → redirect to `/login`
+- Client user → blocked from admin-only routes
+- Client access to `/leads/:id` → validated against assigned ownership
 
-Public:
+---
 
-- `/login`
+## Data Models
 
-Protected:
-
-- `/dashboard`
-- `/leads`
-- `/leads/new` admin only
-- `/leads/:id`
-- `/leads/:id/edit` admin only
-
-Optional:
-
-- `/profile`
-- `/unauthorized`
-- `*` not found route
-
-## Route Access Rules
-
-- Unauthenticated users are redirected to `/login`
-- Authenticated admins can access all protected pages
-- Authenticated clients are blocked from admin-only routes
-- Client access to `/leads/:id` must also be validated against assigned ownership
-
-Frontend guards improve UX, but backend authorization remains the source of truth.
-
-## Lead Data Model
-
-The exact API contract still needs confirmation. A practical lead shape for the frontend is:
+### Lead
 
 ```ts
-type UserRole = "admin" | "client";
-
 type LeadStatus =
   | "new"
   | "contacted"
@@ -102,329 +108,310 @@ type LeadStatus =
   | "lost";
 
 interface Lead {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  company?: string;
-  status: LeadStatus;
-  notes: string;
-  assignedClientId: number | null;
+  id:                 number;
+  name:               string;
+  email:              string;
+  phone:              string;
+  company?:           string;
+  status:             LeadStatus;
+  notes:              string;
+  assignedClientId:   number | null;
   assignedClientName?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt:          string;
+  updatedAt:          string;
 }
 ```
 
-## Suggested Auth/User Model
+### Auth User
 
 ```ts
 interface AuthUser {
-  id: number;
-  name: string;
+  id:    number;
+  name:  string;
   email: string;
-  role: "admin" | "client";
+  role:  "admin" | "client";
 }
 ```
 
-Expected auth flow:
+### Paginated Response
 
-1. User logs in with backend credentials
-2. Backend returns token or session cookie plus user profile
-3. Frontend stores auth state
-4. Protected routes and UI are rendered based on role
+```ts
+interface PaginatedResponse<T> {
+  data:        T[];
+  currentPage: number;
+  perPage:     number;
+  total:       number;
+  lastPage:    number;
+}
+```
 
-## Core Pages
+---
 
-### Login Page
+## Auth Flow
 
-- Email/password form
+```
+1. User submits email + password
+2. Backend returns token + user profile
+3. Frontend stores auth state (Zustand / Context)
+4. Protected routes render based on role
+5. Token sent as Bearer on every API request
+```
+
+---
+
+## Pages
+
+<details>
+<summary><strong>Login</strong></summary>
+
+<br/>
+
+- Email + password form
 - Validation and error handling
-- Redirect to dashboard after success
+- Redirect to `/dashboard` on success
 
-### Dashboard
+</details>
 
-Admin dashboard:
+<details>
+<summary><strong>Dashboard</strong></summary>
 
-- Total leads
-- Leads by status
-- Recent activity or recently updated leads
-- Quick links to create or manage leads
+<br/>
 
-Client dashboard:
+**Admin:**
+- Total leads · Leads by status · Recent activity · Quick create link
 
-- My total leads
-- My leads by status
-- Recently updated assigned leads
+**Client:**
+- My total leads · My leads by status · Recently updated assigned leads
 
-### Leads List Page
+</details>
 
-Features:
+<details>
+<summary><strong>Leads List</strong></summary>
 
-- Table or card list
+<br/>
+
+- Table (desktop) / card layout (mobile)
 - Search by name, email, phone, company
 - Filter by status
 - Sort by updated date, created date, name, status
 - Pagination
-- Role-aware actions
+- Role-aware action buttons
 
-Admin actions:
+**Admin actions:** View · Edit · Delete · Create
+**Client actions:** View assigned leads only
 
-- View
-- Edit
-- Delete
-- Create lead button
+</details>
 
-Client actions:
+<details>
+<summary><strong>Lead Detail</strong></summary>
 
-- View only assigned leads
-- Edit limited fields where allowed
+<br/>
 
-### Lead Detail Page
+- Name, email, phone, company, status, notes, assignment, timestamps
 
-Shows:
+**Admin:** Edit all fields · Delete lead
+**Client:** View only · Edit `notes` and `status`
 
-- Basic lead information
-- Notes
-- Status
-- Ownership/assignment
-- Created and updated timestamps
+</details>
 
-Admin can:
+<details>
+<summary><strong>Lead Create / Edit Form</strong></summary>
 
-- Edit all fields
-- Delete lead
+<br/>
 
-Client can:
+**Admin fields:** Name · Email · Phone · Company · Status · Notes · Assigned client
 
-- View assigned lead details
-- Update notes and status only
+**Client fields:** Notes · Status
 
-### Lead Create/Edit Form
+</details>
 
-Admin form fields:
+---
 
-- Name
-- Email
-- Phone
-- Company
-- Status
-- Notes
-- Assigned client
-
-Client edit form:
-
-- Notes
-- Status
-
-## State Management Plan
-
-Use separate layers:
-
-- Auth store:
-  - current user
-  - login/logout
-  - token/session bootstrap
-- Query layer:
-  - leads list
-  - lead detail
-  - dashboard summary
-  - create/update/delete mutations
-- UI state:
-  - filters
-  - sort config
-  - pagination
-  - modal visibility
-
-## API Integration Plan
-
-The backend contract should ideally expose endpoints similar to:
+## API Contract
 
 ```http
-POST /api/login
-POST /api/logout
-GET /api/me
+POST   /api/login
+POST   /api/logout
+GET    /api/me
 
-GET /api/leads
-GET /api/leads/:id
-POST /api/leads
-PUT /api/leads/:id
+GET    /api/leads
+GET    /api/leads/:id
+POST   /api/leads
+PUT    /api/leads/:id
 DELETE /api/leads/:id
 
-GET /api/dashboard
+GET    /api/dashboard
 ```
 
-Recommended expectations:
-
+**Expectations:**
 - Backend filters client-visible leads automatically
-- Backend rejects unauthorized actions even if frontend attempts them
-- Validation errors return structured messages
-- Pagination metadata is included for the leads listing
+- Validation errors return structured field-level messages
+- Pagination metadata included on list endpoints
 
-Example paginated response shape:
+---
 
-```ts
-interface PaginatedResponse<T> {
-  data: T[];
-  currentPage: number;
-  perPage: number;
-  total: number;
-  lastPage: number;
-}
+## State Architecture
+
+```
+┌────────────────────────────────────────────────┐
+│                  Auth Store                    │
+│  current user · login/logout · token bootstrap │
+└────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────┐
+│              TanStack Query Layer              │
+│  leads list · lead detail · dashboard          │
+│  create / update / delete mutations            │
+└────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────┐
+│                  UI State                      │
+│  filters · sort · pagination · modals          │
+└────────────────────────────────────────────────┘
 ```
 
-## Role-Based UI Rules
+---
 
-### Admin UI
+## Folder Structure
 
-- Show create button
-- Show edit/delete actions
-- Show assigned client information
-- Show all records in list and dashboard
-
-### Client UI
-
-- Hide create/delete actions
-- Restrict list to assigned leads
-- Disable or remove protected form inputs
-- Prevent navigation to admin-only pages
-
-## Suggested Folder Structure
-
-```txt
+```
 src/
-  api/
-    client.ts
-    auth.ts
-    leads.ts
-    dashboard.ts
-  app/
-    router.tsx
-    providers.tsx
-  components/
-    ui/
-    layout/
-    leads/
-  features/
-    auth/
-    dashboard/
-    leads/
-  hooks/
-  lib/
-    constants.ts
-    guards.ts
-    utils.ts
-  pages/
-    LoginPage.tsx
-    DashboardPage.tsx
-    LeadsPage.tsx
-    LeadDetailPage.tsx
-    LeadFormPage.tsx
-    UnauthorizedPage.tsx
-  stores/
-    authStore.ts
-  types/
-    auth.ts
-    lead.ts
-  main.tsx
+├── api/
+│   ├── client.ts
+│   ├── auth.ts
+│   ├── leads.ts
+│   └── dashboard.ts
+├── app/
+│   ├── router.tsx
+│   └── providers.tsx
+├── components/
+│   ├── ui/
+│   ├── layout/
+│   └── leads/
+├── features/
+│   ├── auth/
+│   ├── dashboard/
+│   └── leads/
+├── hooks/
+├── lib/
+│   ├── constants.ts
+│   ├── guards.ts
+│   └── utils.ts
+├── pages/
+│   ├── LoginPage.tsx
+│   ├── DashboardPage.tsx
+│   ├── LeadsPage.tsx
+│   ├── LeadDetailPage.tsx
+│   ├── LeadFormPage.tsx
+│   └── UnauthorizedPage.tsx
+├── stores/
+│   └── authStore.ts
+├── types/
+│   ├── auth.ts
+│   └── lead.ts
+└── main.tsx
 ```
 
-## UI Notes
-
-The interface should prioritize clarity over density because the dataset is small.
-
-Recommended approach:
-
-- Responsive sidebar or top navigation
-- Summary cards on dashboard
-- Simple data table for desktop
-- Card layout fallback for mobile
-- Clear badge styles for lead status
-- Empty states and loading states on every data screen
+---
 
 ## Validation Rules
 
-Suggested frontend validation:
+| Field | Rule |
+|-------|------|
+| `name` | Required |
+| `email` | Required · valid format |
+| `phone` | Required |
+| `status` | Required |
+| `notes` | Optional |
+| `assignedClientId` | Required for admin-created client-owned leads |
 
-- `name`: required
-- `email`: required, valid email format
-- `phone`: required
-- `status`: required
-- `notes`: optional unless business rules require it
-- `assignedClientId`: required for admin-created client-owned leads if ownership is mandatory
+---
 
-## Key Unknowns To Confirm
+## Role-Based UI Rules
 
-These should be clarified with the backend owner or assignment reviewer:
+| Feature | Admin | Client |
+|---------|-------|--------|
+| Create lead button | ✅ | ❌ |
+| Edit / delete actions | ✅ | ❌ |
+| All records in list | ✅ | ❌ assigned only |
+| Edit `notes` + `status` | ✅ | ✅ |
+| Edit contact / ownership fields | ✅ | ❌ |
+| Admin-only routes | ✅ | ❌ redirected |
+
+---
+
+## MVP Roadmap
+
+**Phase 1 — Core**
+- [ ] Login + auth flow
+- [ ] Protected routes + role-aware navigation
+- [ ] Leads list + lead detail
+- [ ] Admin CRUD forms
+- [ ] Client notes/status edit
+
+**Phase 2 — Polish**
+- [ ] Dashboard summaries
+- [ ] Search · filter · sort · pagination
+- [ ] Improved error, loading, and empty states
+
+**Phase 3 — Refinement**
+- [ ] Optimistic UI updates
+- [ ] Reusable table and filter components
+- [ ] Analytics cards
+
+---
+
+## Delivery Order
+
+```
+1.  Init React + Vite + TypeScript
+2.  Add routing and auth shell
+3.  Create API client and auth flow
+4.  Implement role guards
+5.  Build leads list and detail pages
+6.  Build admin CRUD forms
+7.  Build client limited edit flow
+8.  Add dashboard
+9.  Add search / filter / sort / pagination
+10. Polish UI and edge states
+```
+
+---
+
+## Open Questions
+
+These should be confirmed with the backend owner before building:
 
 1. Can clients create leads?
 2. What exact lead fields are required?
-3. How is lead ownership represented in the API?
-4. What authentication mechanism is used?
-   - session cookies
-   - Sanctum
-   - JWT
-5. What does the dashboard endpoint return, if any?
-6. Are notes/status updates separate endpoints or part of general lead update?
-7. What pagination/filter/sort query parameters does the backend support?
+3. How is lead ownership represented in the API response?
+4. What auth mechanism is in use — Sanctum, JWT, or session cookies?
+5. What does the dashboard endpoint return?
+6. Are notes/status updates separate endpoints or part of `PUT /api/leads/:id`?
+7. What pagination, filter, and sort query parameters does the backend support?
 
-## Recommended MVP Scope
-
-Phase 1:
-
-- Login
-- Protected routes
-- Role-aware navigation
-- Leads list
-- Lead detail
-- Admin create/edit/delete
-- Client notes/status edit
-
-Phase 2:
-
-- Dashboard summaries
-- Search, filter, sort
-- Pagination
-- Better error states and polish
-
-Phase 3:
-
-- Optimistic UI updates where safe
-- Reusable table/filter components
-- Better analytics cards
-
-## Suggested Delivery Order
-
-1. Initialize React + Vite + TypeScript app
-2. Add routing and auth shell
-3. Create API client and auth flow
-4. Implement role guards
-5. Build leads list and detail pages
-6. Build admin CRUD forms
-7. Build client limited edit flow
-8. Add dashboard
-9. Add search/filter/sort/pagination
-10. Polish UI and edge states
-
-## Practical Assumptions For Starting Development
-
-Unless told otherwise, these are reasonable assumptions:
-
-- Clients cannot create leads
-- Each lead belongs to zero or one client
-- Clients may edit only `notes` and `status`
-- Admins have unrestricted lead management access
-- Backend enforces real authorization rules
-- The frontend uses TypeScript
+---
 
 ## Definition of Done
 
-The frontend is complete when:
+```
+✦  Users authenticate successfully
+✦  Admins manage all leads end to end
+✦  Clients access only their assigned leads
+✦  Role restrictions visible in UI and enforced in navigation
+✦  List and detail flows work cleanly
+✦  App works on desktop and mobile
+✦  API errors, loading states, and empty states handled throughout
+```
 
-- Users can authenticate successfully
-- Admins can manage all leads end to end
-- Clients can only access their own leads
-- Client-only restrictions are visible in UI and enforced in navigation
-- Leads pages support list and detail flows cleanly
-- The app works on desktop and mobile
-- API errors, loading states, and empty states are handled clearly
+---
+
+## 📄 License
+
+Internal use only. Add a licence file if this becomes public.
+
+---
+
+<div align="center">
+  <sub>Built with React · TypeScript · Vite · Tailwind</sub>
+</div>

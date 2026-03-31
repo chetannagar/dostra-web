@@ -1,90 +1,176 @@
-import type { Lead, LeadStatus, User } from '../types/types.ts'
-import { statusLabel } from '../constants/app.ts'
-import { currency, shortDate } from '../utils/format.ts'
-import ClientEditor from './ClientEditor.tsx'
+import type { Lead } from '../types/types.ts'
+import { formatDateTime, initials } from '../utils/format.ts'
+import '../styles/detail.css'
 
 interface LeadDetailCardProps {
-  activeUser: User
-  lead: Lead
-  onDelete: (leadId: number) => void
-  onEdit: (lead: Lead) => void
-  onClientSave: (leadId: number, status: LeadStatus, notes: string) => void
+  lead: Lead | null
+  isLoading: boolean
 }
 
-function LeadDetailCard({
-  activeUser,
-  lead,
-  onDelete,
-  onEdit,
-  onClientSave,
-}: LeadDetailCardProps) {
+function LeadDetailCard({ lead, isLoading }: LeadDetailCardProps) {
+  if (isLoading) {
+    return (
+      <section className="surface-card detail-card">
+        <div className="empty-state">
+          <h4>Loading lead detail...</h4>
+          <p>Fetching the latest record from `/api/leads/{'{id}'}`.</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (!lead) {
+    return (
+      <section className="surface-card detail-card">
+        <div className="empty-state">
+          <h4>Select a lead.</h4>
+          <p>Lead details will appear here after you pick a record from the list.</p>
+        </div>
+      </section>
+    )
+  }
+
+  const timeline = [
+    {
+      title: 'Webhook received',
+      body: `${lead.source ?? 'Unknown source'} payload accepted for ${lead.clientName}.`,
+      time: formatDateTime(lead.createdAt),
+    },
+    {
+      title: 'Lead normalized',
+      body: 'Record prepared for CRM review and assignment.',
+      time: formatDateTime(lead.updatedAt),
+    },
+    {
+      title: 'Ready for action',
+      body: 'Visible in the lead registry and available for downstream review.',
+      time: formatDateTime(lead.updatedAt),
+    },
+  ]
+
   return (
-    <section className="surface-card detail-card">
-      <div className="surface-head">
-        <div>
-          <p className="section-label">Lead detail</p>
-          <h3>{lead.name}</h3>
+    <section className="panel-stack">
+      <div className="page-intro detail-page-head">
+        <div className="lead-header">
+          <div className="avatar-pill large">{initials(lead.name ?? lead.email ?? 'Lead')}</div>
+          <div>
+            <p className="section-label">Lead Detail</p>
+            <h2>{lead.name ?? 'Unnamed lead'}</h2>
+            <p className="lead-subtitle">
+              {lead.email ?? 'No direct email'} · {lead.clientName}
+            </p>
+          </div>
         </div>
-        <span className={`status-badge status-${lead.status}`}>{statusLabel[lead.status]}</span>
-      </div>
-
-      <div className="detail-grid">
-        <div>
-          <span>Email</span>
-          <strong>{lead.email}</strong>
-        </div>
-        <div>
-          <span>Phone</span>
-          <strong>{lead.phone}</strong>
-        </div>
-        <div>
-          <span>Company</span>
-          <strong>{lead.company}</strong>
-        </div>
-        <div>
-          <span>Value</span>
-          <strong>{currency(lead.value)}</strong>
-        </div>
-        <div>
-          <span>Owner</span>
-          <strong>{lead.owner}</strong>
-        </div>
-        <div>
-          <span>Assigned client</span>
-          <strong>{lead.assignedClientName ?? 'Unassigned'}</strong>
-        </div>
-      </div>
-
-      <div className="note-block">
-        <span className="section-label">Notes</span>
-        <p>{lead.notes}</p>
-      </div>
-
-      <div className="meta-line">
-        <small>Created {shortDate(lead.createdAt)}</small>
-        <small>Updated {shortDate(lead.updatedAt)}</small>
-      </div>
-
-      {activeUser.role === 'admin' ? (
-        <div className="button-row">
-          <button className="secondary-button" onClick={() => onEdit(lead)} type="button">
+        <div className="header-actions">
+          <button className="secondary-button" type="button">
             Edit lead
           </button>
-          <button
-            className="ghost-button danger"
-            onClick={() => onDelete(lead.id)}
-            type="button"
-          >
-            Delete
+          <button className="primary-button" type="button">
+            Review payload
           </button>
         </div>
-      ) : (
-        <ClientEditor
-          key={lead.id}
-          lead={lead}
-          onSave={(status, notes) => onClientSave(lead.id, status, notes)}
-        />
-      )}
+      </div>
+
+      <div className="detail-layout">
+        <div className="details-column">
+          <section className="surface-card detail-section">
+            <div className="surface-head">
+              <div>
+                <p className="section-label">Identity details</p>
+                <h3>Lead record</h3>
+              </div>
+            </div>
+            <div className="detail-grid">
+              <div>
+                <span>Email</span>
+                <strong>{lead.email ?? 'Not provided'}</strong>
+              </div>
+              <div>
+                <span>Client</span>
+                <strong>{lead.clientName}</strong>
+              </div>
+              <div>
+                <span>Client key</span>
+                <strong>{lead.clientKey}</strong>
+              </div>
+              <div>
+                <span>Webhook event</span>
+                <strong>{lead.webhookEventId ?? 'Not provided'}</strong>
+              </div>
+            </div>
+          </section>
+
+          <section className="surface-card detail-section">
+            <div className="surface-head">
+              <div>
+                <p className="section-label">Message</p>
+                <h3>Captured submission</h3>
+              </div>
+            </div>
+            <div className="note-block">
+              <p>{lead.message ?? 'No message body was stored for this lead.'}</p>
+            </div>
+          </section>
+
+          <section className="surface-card detail-section">
+            <div className="surface-head">
+              <div>
+                <p className="section-label">Audit info</p>
+                <h3>Timestamps</h3>
+              </div>
+            </div>
+            <div className="detail-grid">
+              <div>
+                <span>Created</span>
+                <strong>{formatDateTime(lead.createdAt)}</strong>
+              </div>
+              <div>
+                <span>Updated</span>
+                <strong>{formatDateTime(lead.updatedAt)}</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div className="details-column">
+          <section className="surface-card detail-section">
+            <div className="surface-head">
+              <div>
+                <p className="section-label">Ingestion timeline</p>
+                <h3>Processing events</h3>
+              </div>
+              <span className="pill positive">Visible</span>
+            </div>
+            <div className="timeline-list">
+              {timeline.map((entry) => (
+                <div key={entry.title} className="timeline-item static-row">
+                  <span className="timeline-dot" />
+                  <div className="timeline-copy">
+                    <strong>{entry.title}</strong>
+                    <p>{entry.body}</p>
+                    <small>{entry.time}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="surface-card detail-section">
+            <div className="surface-head">
+              <div>
+                <p className="section-label">Raw webhook payload</p>
+                <h3>Payload body</h3>
+              </div>
+              <button className="ghost-button" type="button">
+                Copy JSON
+              </button>
+            </div>
+            <div className="payload-block">
+              <pre>{JSON.stringify(lead.rawPayload ?? {}, null, 2)}</pre>
+            </div>
+          </section>
+        </div>
+      </div>
     </section>
   )
 }

@@ -1,40 +1,39 @@
-import type { Lead, LeadFormState, LeadStatus, User } from '../types/types.ts'
-import LeadData from '../data/leads.json'
+import type { LeadFilters, TabKey, UserRole } from '../types/types.ts'
 
-export const users: User[] = [
-  { id: 1, name: 'Maya Patel', email: 'maya@northstarcrm.com', role: 'admin' },
-  { id: 2, name: 'Acme Ventures', email: 'ops@acmeventures.com', role: 'client' },
-  { id: 3, name: 'BrightPath Labs', email: 'growth@brightpathlabs.com', role: 'client' },
-]
-
-export const initialLeads: Lead[] = LeadData as Lead[]
-
-export const statusOrder: LeadStatus[] = [
-  'new',
-  'contacted',
-  'qualified',
-  'proposal_sent',
-  'won',
-  'lost',
-]
-
-export const statusLabel: Record<LeadStatus, string> = {
-  new: 'New',
-  contacted: 'Contacted',
-  qualified: 'Qualified',
-  proposal_sent: 'Proposal Sent',
-  won: 'Won',
-  lost: 'Lost',
+export const defaultFilters: LeadFilters = {
+  clientId: '',
+  email: '',
+  search: '',
+  from: '',
+  to: '',
+  perPage: 10,
+  page: 1,
 }
 
-export const emptyForm: LeadFormState = {
-  name: '',
-  email: '',
-  phone: '',
-  company: '',
-  value: '',
-  status: 'new',
-  source: '',
-  notes: '',
-  assignedClientId: '',
+export const routeToTab: Record<string, TabKey> = {
+  dashboard: 'dashboard',
+  leads: 'leads',
+  'lead-detail': 'lead-detail',
+  clients: 'clients',
+  users: 'users',
+}
+
+export function getInitialTab() {
+  const hash = window.location.hash.replace(/^#\/?/, '')
+  return routeToTab[hash] ?? 'dashboard'
+}
+
+export function syncHash(tab: TabKey) {
+  window.history.replaceState(null, '', `#/${tab}`)
+}
+
+export function isAdminOnlyTab(tab: TabKey) {
+  return tab === 'clients' || tab === 'users'
+}
+
+export function getPresetCredentials(role: UserRole) {
+  return {
+    email: role === 'admin' ? 'admin@example.com' : 'client@example.com',
+    password: 'password',
+  }
 }

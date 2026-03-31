@@ -1,22 +1,22 @@
 :root {
-  --bg-canvas: #eef3f8;
-  --bg-soft: #f8fbfd;
+  --bg-canvas: #f3efe7;
+  --bg-soft: #fbf7f0;
   --bg-panel: rgba(255, 255, 255, 0.92);
   --bg-panel-strong: #ffffff;
-  --bg-sidebar: #10243b;
-  --bg-sidebar-alt: #0b1a2b;
-  --bg-accent-soft: rgba(212, 163, 74, 0.16);
-  --border-soft: rgba(15, 37, 64, 0.1);
-  --border-strong: rgba(15, 37, 64, 0.16);
+  --bg-sidebar: #11233a;
+  --bg-sidebar-alt: #0c1727;
+  --bg-accent-soft: rgba(188, 135, 47, 0.16);
+  --border-soft: rgba(17, 35, 58, 0.12);
+  --border-strong: rgba(17, 35, 58, 0.2);
   --text-main: #11263d;
-  --text-muted: #526277;
-  --text-soft: #728298;
-  --text-on-dark: #eef4fb;
-  --accent: #c58a22;
-  --accent-strong: #9f6810;
-  --accent-deep: #7c5310;
+  --text-muted: #596579;
+  --text-soft: #8a96a8;
+  --text-on-dark: #f4f7fb;
+  --accent: #bc872f;
+  --accent-strong: #9b6a1e;
+  --accent-deep: #7d5419;
   --danger: #b24f32;
-  --focus-ring: rgba(197, 138, 34, 0.28);
+  --focus-ring: rgba(188, 135, 47, 0.32);
   font-family:
     "Instrument Sans",
     "Avenir Next",
@@ -45,8 +45,8 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(212, 163, 74, 0.12), transparent 28%),
-    linear-gradient(180deg, #f7fafc 0%, var(--bg-canvas) 100%);
+    radial-gradient(circle at top left, rgba(188, 135, 47, 0.14), transparent 28%),
+    linear-gradient(180deg, #faf7f1 0%, var(--bg-canvas) 100%);
   color: var(--text-main);
 }
 
