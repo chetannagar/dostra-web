@@ -23,39 +23,36 @@ function LoginView({
   onSubmit,
 }: LoginViewProps) {
   return (
-    <main className="auth-shell refined-auth">
+    <main className="auth-shell">
       <section className="auth-visual">
-        <div className="auth-logo">
-          <span className="logo-mark">D</span>
-          <strong>Dostra CRM</strong>
-        </div>
-        <div className="auth-quote">
-          <span className="pill neutral">Lead Operations</span>
-          <h1>Lead ingestion now feels like an operating system, not a spreadsheet.</h1>
-          <p>
-            Sign in with the seeded Laravel accounts and continue into the protected CRM shell.
-          </p>
-        </div>
-        <div className="auth-persona">
-          <strong>Built for admin oversight and client-safe access</strong>
-          <small>Seeded admin and client credentials are available in the sign-in card.</small>
+        <div className="auth-shape" aria-hidden="true" />
+
+        <div className="auth-brand">
+          <div className="auth-logo">
+            <span className="logo-mark">D</span>
+            <strong>Dostra</strong>
+          </div>
+
+          <div className="auth-copy">
+            <h1>Sign in to Dostra CRM</h1>
+            <p>Lead operations for teams managing inbound client pipelines.</p>
+          </div>
         </div>
       </section>
 
       <section className="auth-panel surface-card">
         <div className="surface-head">
           <div>
-            <p className="section-label">Welcome back</p>
             <h3>Access the dashboard</h3>
           </div>
         </div>
 
-        <div className="role-toggle">
+        <div className="role-toggle" aria-label="Seeded local accounts">
           <button className="toggle-button" onClick={() => onPresetSelect('admin')} type="button">
-            Admin
+            Use admin seed
           </button>
           <button className="toggle-button" onClick={() => onPresetSelect('client')} type="button">
-            Client
+            Use client seed
           </button>
         </div>
 
@@ -81,23 +78,10 @@ function LoginView({
             />
           </label>
 
-          <div className="auth-hints stacked">
-            <div className="surface-card compact-card">
-              <p className="section-label">Seeded admin</p>
-              <strong>admin@example.com</strong>
-              <small>password</small>
-            </div>
-            <div className="surface-card compact-card">
-              <p className="section-label">Seeded client</p>
-              <strong>client@example.com</strong>
-              <small>password</small>
-            </div>
-          </div>
-
           {errorMessage ? <p className="error-banner">{errorMessage}</p> : null}
 
           <button className="primary-button auth-submit" disabled={isSubmitting} type="submit">
-            {isSubmitting ? 'Signing in...' : 'Sign in to dashboard'}
+            {isSubmitting ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
       </section>
