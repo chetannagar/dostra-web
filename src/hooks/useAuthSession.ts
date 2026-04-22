@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
 import type { AuthState, UserRole } from '../types/types.ts'
-import { getPresetCredentials } from '../constants/app.ts'
 import { getCurrentUser, getStoredToken, login, logout, setStoredToken } from '../services/api.ts'
 import { getApiErrorMessage } from '../utils/errors.ts'
 
@@ -14,12 +12,19 @@ interface UseAuthSessionResult {
   loginPassword: string
   clearError: () => void
   clearSession: () => void
-  handleLogin: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  handleLogin: () => Promise<void>
   handleLogout: () => Promise<void>
   setErrorMessage: (message: string | null) => void
   setLoginEmail: (value: string) => void
   setLoginPassword: (value: string) => void
   setPresetRole: (role: UserRole) => void
+}
+
+function getPresetCredentials(role: UserRole) {
+  return {
+    email: role === 'admin' ? 'admin@example.com' : 'client@example.com',
+    password: 'password',
+  }
 }
 
 export function useAuthSession(): UseAuthSessionResult {
@@ -49,8 +54,7 @@ export function useAuthSession(): UseAuthSessionResult {
   }, [])
 
   const handleLogin = useCallback(
-    async (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault()
+    async () => {
       setIsLoginPending(true)
       clearError()
 

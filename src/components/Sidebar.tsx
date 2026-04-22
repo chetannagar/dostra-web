@@ -1,6 +1,6 @@
 import DostraLogo from './DostraLogo.tsx'
 import Icon from './Icon.tsx'
-import type { AuthUser, NavKey } from '../types/types.ts'
+import type { User, NavKey } from '../types/types.ts'
 import { initials } from '../utils/format.ts'
 
 interface SidebarProps {
@@ -8,7 +8,7 @@ interface SidebarProps {
   current: NavKey
   onNav: (key: 'dashboard' | 'leads') => void
   onToggle: () => void
-  user: AuthUser
+  user: User
 }
 
 const navItems: Array<{

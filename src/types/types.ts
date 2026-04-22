@@ -13,15 +13,7 @@ export interface ClientSummary {
   updated_at: string
 }
 
-export interface UserRecord {
-  id: number
-  name: string
-  email: string
-  role: UserRole
-  clients: ClientSummary[]
-}
-
-export interface AuthUser {
+export interface User {
   id: number
   name: string
   email: string
@@ -31,7 +23,7 @@ export interface AuthUser {
 
 export interface AuthState {
   token: string | null
-  user: AuthUser | null
+  user: User | null
 }
 
 export interface Lead {

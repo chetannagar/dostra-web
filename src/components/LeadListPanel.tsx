@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import Icon from './Icon.tsx'
-import type { AuthUser, Lead, LeadFilters, PaginationMeta } from '../types/types.ts'
+import type { User, Lead, LeadFilters, PaginationMeta } from '../types/types.ts'
 import {
   formatDateTime,
   formatLeadReceived,
@@ -10,7 +10,7 @@ import {
 } from '../utils/format.ts'
 
 interface LeadListPanelProps {
-  activeUser: AuthUser
+  activeUser: User
   availableClients: Array<{ key: string; label: string }>
   filters: LeadFilters
   isLoading: boolean

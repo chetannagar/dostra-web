@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { buildLeadSearch, defaultFilters, getCurrentLocation, getStoredSidebarCollapsed, getStoredThemeMode, navigateTo, parseLeadFilters, parseSelectedLeadId, setStoredSidebarCollapsed, setStoredThemeMode } from './constants/app.ts'
+import { buildLeadSearch, defaultFilters, getCurrentLocation, navigateTo, parseLeadFilters, parseSelectedLeadId } from './utils/router.ts'
+import { getStoredSidebarCollapsed, getStoredThemeMode, setStoredSidebarCollapsed, setStoredThemeMode } from './utils/storage.ts'
 import { useAuthSession } from './hooks/useAuthSession.ts'
 import { useLeadWorkspace } from './hooks/useLeadWorkspace.ts'
 import type { LeadFilters, NavKey, ThemeMode } from './types/types.ts'

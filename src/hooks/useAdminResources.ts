@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { ClientSummary, UserRecord } from '../types/types.ts'
+import type { ClientSummary, User } from '../types/types.ts'
 
 export function useAdminResources() {
   return useMemo(
@@ -7,7 +7,7 @@ export function useAdminResources() {
       clients: [] as ClientSummary[],
       isClientsLoading: false,
       isUsersLoading: false,
-      users: [] as UserRecord[],
+      users: [] as User[],
     }),
     [],
   )

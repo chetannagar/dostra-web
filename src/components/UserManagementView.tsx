@@ -1,8 +1,8 @@
-import type { UserRecord } from '../types/types.ts'
+import type { User } from '../types/types.ts'
 
 interface UserManagementViewProps {
   isLoading: boolean
-  users: UserRecord[]
+  users: User[]
 }
 
 function UserManagementView({ isLoading, users }: UserManagementViewProps) {

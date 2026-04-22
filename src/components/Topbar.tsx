@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import Icon from './Icon.tsx'
-import type { AuthUser, ThemeMode } from '../types/types.ts'
+import type { User, ThemeMode } from '../types/types.ts'
 
 interface TopbarProps {
   crumbs: string[]
@@ -8,7 +8,7 @@ interface TopbarProps {
   onThemeToggle: () => void
   right?: ReactNode
   themeMode: ThemeMode
-  user: AuthUser
+  user: User
 }
 
 function Topbar({ crumbs, onLogout, onThemeToggle, right, themeMode, user }: TopbarProps) {

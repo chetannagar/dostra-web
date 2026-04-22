@@ -1,9 +1,9 @@
-import type { AuthUser, DashboardData, DashboardMetric, Lead } from '../types/types.ts'
+import type { User, DashboardData, DashboardMetric, Lead } from '../types/types.ts'
 import Icon from './Icon.tsx'
 import { formatLeadReceived } from '../utils/format.ts'
 
 interface DashboardViewProps {
-  activeUser: AuthUser
+  activeUser: User
   dashboardData: DashboardData | null
   onLeadOpen: (leadId: number) => void
 }
@@ -67,7 +67,7 @@ function DashboardRecentRow({
   lead,
   onLeadOpen,
 }: {
-  activeUser: AuthUser
+  activeUser: User
   lead: Lead
   onLeadOpen: (leadId: number) => void
 }) {
@@ -159,14 +159,14 @@ function DashboardView({ activeUser, dashboardData, onLeadOpen }: DashboardViewP
             </div>
           </div>
 
-          <div className="flex items-end gap-1.5 h-[170px] pt-2">
+          <div className="flex items-end gap-1.5 h-42.5 pt-2">
             {dashboardData.histogram.map((point, index) => {
               const isToday = index === dashboardData.histogram.length - 1
               const isYesterday = index === dashboardData.histogram.length - 2
               return (
                 <div key={point.label} className="min-w-0 flex-1 flex flex-col items-center gap-1.5">
                   <span className="font-mono tabular-nums text-(--ink-faint) text-[10px]">{point.count}</span>
-                  <div className="w-full h-[130px] flex items-end">
+                  <div className="w-full h-32.5 flex items-end">
                     <div
                       className={`w-full rounded-[3px_3px_1px_1px] border ${
                         isToday

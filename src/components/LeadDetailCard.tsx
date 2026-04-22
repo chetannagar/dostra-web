@@ -186,14 +186,14 @@ function LeadDetailCard({ lead, isLoading, onBack }: LeadDetailCardProps) {
               </div>
               <div className="flex items-center gap-0.5 border border-(--line) rounded-md bg-(--surface-2) p-0.5">
                 <button
-                  className={`border-0 rounded cursor-pointer px-2.25 py-0.75 text-[11.5px] transition-all duration-180 ease-in-out ${payloadMode === 'pretty' ? 'bg-(--surface) text-(--ink) shadow-[var(--shadow-soft)]' : 'bg-transparent text-(--ink-muted)'}`}
+                  className={`border-0 rounded cursor-pointer px-2.25 py-0.75 text-[11.5px] transition-all duration-180 ease-in-out ${payloadMode === 'pretty' ? 'bg-(--surface) text-(--ink) shadow-(--shadow-soft)' : 'bg-transparent text-(--ink-muted)'}`}
                   onClick={() => setPayloadMode('pretty')}
                   type="button"
                 >
                   Pretty
                 </button>
                 <button
-                  className={`border-0 rounded cursor-pointer px-2.25 py-0.75 text-[11.5px] transition-all duration-180 ease-in-out ${payloadMode === 'raw' ? 'bg-(--surface) text-(--ink) shadow-[var(--shadow-soft)]' : 'bg-transparent text-(--ink-muted)'}`}
+                  className={`border-0 rounded cursor-pointer px-2.25 py-0.75 text-[11.5px] transition-all duration-180 ease-in-out ${payloadMode === 'raw' ? 'bg-(--surface) text-(--ink) shadow-(--shadow-soft)' : 'bg-transparent text-(--ink-muted)'}`}
                   onClick={() => setPayloadMode('raw')}
                   type="button"
                 >

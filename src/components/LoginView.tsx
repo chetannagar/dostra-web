@@ -1,4 +1,3 @@
-import type { FormEvent } from 'react'
 import DostraLogo from './DostraLogo.tsx'
 
 interface LoginViewProps {
@@ -7,7 +6,7 @@ interface LoginViewProps {
   isSubmitting: boolean
   onEmailChange: (value: string) => void
   onPasswordChange: (value: string) => void
-  onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  onSubmit: () => Promise<void>
   password: string
 }
 
@@ -20,6 +19,11 @@ function LoginView({
   onSubmit,
   password,
 }: LoginViewProps) {
+  function handleSubmit(event: { preventDefault(): void }) {
+    event.preventDefault()
+    void onSubmit()
+  }
+
   return (
     <main className="min-h-screen grid place-items-center px-6 py-10 bg-(--bg)">
       <section className="w-full max-w-110 flex flex-col gap-7 border border-(--line) rounded-[10px] bg-(--surface) p-7">
@@ -37,7 +41,7 @@ function LoginView({
           </p>
         </div>
 
-        <form className="flex flex-col gap-3.5" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-3.5" onSubmit={handleSubmit}>
           <label className="flex flex-col gap-1.5">
             <span className="font-mono text-[11.5px] text-(--ink-muted) uppercase tracking-[0.8px]">
               Email

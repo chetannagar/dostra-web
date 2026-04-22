@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type {
-  AuthUser,
+  User,
   DashboardData,
   DashboardHistogramPoint,
   DashboardMetric,
@@ -10,7 +10,8 @@ import type {
   QuickStatusItem,
   RankedItem,
 } from '../types/types.ts'
-import { ApiError, getLead, getLeads } from '../services/api.ts'
+import { getLead, getLeads } from '../services/api.ts'
+import { ApiError } from '../utils/errors.ts'
 import { getApiErrorMessage } from '../utils/errors.ts'
 
 interface UseLeadWorkspaceArgs {
@@ -18,7 +19,7 @@ interface UseLeadWorkspaceArgs {
   onUnauthorized: () => void
   selectedLeadId: number | null
   setErrorMessage: (message: string | null) => void
-  user: AuthUser | null
+  user: User | null
 }
 
 function buildHistogram(leads: Lead[]): DashboardHistogramPoint[] {
@@ -43,7 +44,7 @@ function buildHistogram(leads: Lead[]): DashboardHistogramPoint[] {
   })
 }
 
-function buildMetrics(user: AuthUser, leads: Lead[], pagination: PaginationMeta | null): DashboardMetric[] {
+function buildMetrics(user: User, leads: Lead[], pagination: PaginationMeta | null): DashboardMetric[] {
   const total = pagination?.total ?? leads.length
   const recent24h = leads.filter(
     (lead) => Date.now() - new Date(lead.createdAt).getTime() <= 24 * 60 * 60 * 1000,
@@ -120,7 +121,7 @@ function buildMetrics(user: AuthUser, leads: Lead[], pagination: PaginationMeta 
   return base
 }
 
-function buildQuickStatus(user: AuthUser, leads: Lead[]): QuickStatusItem[] {
+function buildQuickStatus(user: User, leads: Lead[]): QuickStatusItem[] {
   const missingEmail = leads.filter((lead) => !lead.email).length
   const emptyMessage = leads.filter((lead) => !lead.message?.trim()).length
   const inactiveClients = leads.filter((lead) => !lead.clientActive).length
@@ -155,7 +156,7 @@ function buildQuickStatus(user: AuthUser, leads: Lead[]): QuickStatusItem[] {
   ]
 }
 
-function buildRankedList(user: AuthUser, leads: Lead[]): RankedItem[] {
+function buildRankedList(user: User, leads: Lead[]): RankedItem[] {
   const countMap = leads.reduce<Map<string, RankedItem>>((acc, lead) => {
     const existing = acc.get(lead.clientKey)
     if (existing) {
@@ -196,7 +197,7 @@ function buildRankedList(user: AuthUser, leads: Lead[]): RankedItem[] {
   return [...sourceMap.values()].sort((a, b) => b.count - a.count).slice(0, 6)
 }
 
-function buildDashboardData(user: AuthUser, leads: Lead[], pagination: PaginationMeta | null): DashboardData {
+function buildDashboardData(user: User, leads: Lead[], pagination: PaginationMeta | null): DashboardData {
   const sorted = [...leads].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   )

@@ -1,4 +1,7 @@
-import type { AuthUser, ClientSummary, Lead, LeadFilters, PaginationMeta, UserRecord } from '../types/types.ts'
+import type { ClientSummary, Lead, LeadFilters, PaginationMeta, User } from '../types/types.ts'
+import { ApiError } from '../utils/errors.ts'
+
+export { ApiError }
 
 const AUTH_TOKEN_KEY = 'dostra_auth_token'
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000/api').replace(
@@ -55,18 +58,6 @@ interface LeadListResponse {
   }
 }
 
-export class ApiError extends Error {
-  status: number
-  body: unknown
-
-  constructor(message: string, status: number, body: unknown) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-    this.body = body
-  }
-}
-
 export function getStoredToken() {
   return localStorage.getItem(AUTH_TOKEN_KEY)
 }
@@ -105,17 +96,7 @@ async function request<T>(path: string, options: RequestInit = {}) {
   return body as T
 }
 
-function mapUser(user: ApiUser): AuthUser {
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    clients: user.clients,
-  }
-}
-
-function mapUserRecord(user: ApiUser): UserRecord {
+function mapUser(user: ApiUser): User {
   return {
     id: user.id,
     name: user.name,
@@ -210,5 +191,5 @@ export async function getClients() {
 
 export async function getUsers() {
   const response = await request<ApiUser[]>('/users')
-  return response.map(mapUserRecord)
+  return response.map(mapUser)
 }
