@@ -1,80 +1,82 @@
-import type { AuthUser, LeadFilters, TabKey } from '../types/types.ts'
+import type { ReactNode } from 'react'
+import Icon from './Icon.tsx'
+import type { AuthUser, ThemeMode } from '../types/types.ts'
 
 interface TopbarProps {
-  activeTab: TabKey
-  activeUser: AuthUser
-  filters: LeadFilters
-  onFilterChange: (nextFilters: LeadFilters) => void
-  onRefresh: () => void
+  crumbs: string[]
   onLogout: () => void
+  onThemeToggle: () => void
+  right?: ReactNode
+  themeMode: ThemeMode
+  user: AuthUser
 }
 
-const titles: Record<TabKey, { title: string; subtitle: string }> = {
-  dashboard: {
-    title: 'Dashboard Overview',
-    subtitle: 'Monitor lead ingestion and recent system activity.',
-  },
-  leads: {
-    title: 'Leads Management',
-    subtitle: 'Filter and inspect inbound leads from the shared registry.',
-  },
-  'lead-detail': {
-    title: 'Lead Detail',
-    subtitle: 'Audit payloads, client attribution, and processing events.',
-  },
-  clients: {
-    title: 'Client Management',
-    subtitle: 'Control tenants, client status, and webhook credentials.',
-  },
-  users: {
-    title: 'User Management',
-    subtitle: 'Manage roles, assignments, and access scope.',
-  },
-}
-
-function Topbar({
-  activeTab,
-  activeUser,
-  filters,
-  onFilterChange,
-  onRefresh,
-  onLogout,
-}: TopbarProps) {
-  const header = titles[activeTab]
-
+function Topbar({ crumbs, onLogout, onThemeToggle, right, themeMode, user }: TopbarProps) {
   return (
-    <header className="topbar refined-topbar">
-      <div className="topbar-page">
-        <p className="topbar-welcome">Welcome back,</p>
-        <h1>{activeUser.name}</h1>
-        <p className="muted">{header.subtitle}</p>
+    <header className="flex items-center gap-4 h-14 border-b border-(--line) bg-(--surface) px-5">
+      <div className="min-w-0 flex items-center gap-2">
+        {crumbs.map((crumb, index) => (
+          <span key={crumb} className="inline-flex items-center gap-2">
+            <span
+              className={
+                index === crumbs.length - 1
+                  ? 'text-[13px] text-(--ink) font-medium'
+                  : 'text-[13px] text-(--ink-muted)'
+              }
+            >
+              {crumb}
+            </span>
+            {index < crumbs.length - 1 ? <Icon name="chevron" size={12} /> : null}
+          </span>
+        ))}
       </div>
 
-      <div className="topbar-actions">
-        <span className="client-chip">
-          {activeUser.role === 'admin'
-            ? `${activeUser.clients.length || 'All'} clients`
-            : activeUser.clients[0]?.name ?? 'Assigned client'}
-        </span>
-
-        <label className="search-field">
-          <span className="sr-only">Search leads</span>
+      <div className="flex-1 flex justify-center">
+        <label className="w-[min(100%,420px)] flex items-center gap-2 border border-(--line) rounded-md bg-(--surface-2) text-(--ink-faint) px-2.5 py-1.5">
+          <Icon name="search" size={14} />
           <input
+            className="min-w-0 flex-1 text-[13px] text-(--ink) placeholder:text-(--ink-faint)"
+            placeholder="Search leads, clients, payloads…"
+            readOnly
             type="search"
-            placeholder="Search leads, clients..."
-            value={filters.search}
-            onChange={(event) =>
-              onFilterChange({ ...filters, search: event.target.value, page: 1 })
-            }
           />
+          <kbd className="border border-(--line) rounded-[3px] bg-(--surface) text-(--ink-faint) px-1.25 py-px font-mono text-[10.5px]">
+            ⌘K
+          </kbd>
         </label>
+      </div>
 
-        <button className="secondary-button" onClick={onRefresh} type="button">
-          Refresh
+      <div className="flex items-center gap-2.5">
+        {right}
+        <div className="inline-flex items-center gap-1.5 border border-(--line) rounded-[20px] px-2 py-1 text-[11.5px] text-(--ink-muted) bg-(--surface)">
+          <span className="w-1.5 h-1.5 rounded-full bg-(--signal)" />
+          {user.role === 'admin' ? (
+            <span>
+              All clients ·{' '}
+              <span className="font-mono tabular-nums">{Math.max(user.clients.length, 1)}</span>
+            </span>
+          ) : (
+            <span>
+              {user.clients[0]?.name ?? 'Assigned client'}{' '}
+              <span className="font-mono tabular-nums text-(--ink-faint)">
+                {user.clients[0]?.client_key ?? 'client'}
+              </span>
+            </span>
+          )}
+        </div>
+        <button
+          className="inline-flex items-center justify-center rounded-md border border-(--line) bg-(--surface) text-(--ink-muted) cursor-pointer w-8 h-8 p-0 transition-all duration-180 ease-in-out"
+          onClick={onThemeToggle}
+          type="button"
+        >
+          <Icon name={themeMode === 'light' ? 'moon' : 'sun'} size={14} />
         </button>
-
-        <button className="ghost-button" onClick={onLogout} type="button">
-          Sign out
+        <button
+          className="inline-flex items-center justify-center rounded-md border border-(--line) bg-(--surface) text-(--ink-muted) cursor-pointer w-8 h-8 p-0 transition-all duration-180 ease-in-out"
+          onClick={onLogout}
+          type="button"
+        >
+          <Icon name="logout" size={14} />
         </button>
       </div>
     </header>

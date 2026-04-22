@@ -1,6 +1,8 @@
 export type UserRole = 'admin' | 'client'
 
-export type TabKey = 'dashboard' | 'leads' | 'lead-detail' | 'clients' | 'users'
+export type ThemeMode = 'light' | 'dark'
+
+export type NavKey = 'dashboard' | 'leads' | 'clients' | 'users'
 
 export interface ClientSummary {
   id: number
@@ -66,4 +68,43 @@ export interface PaginationMeta {
   perPage: number
   to: number | null
   total: number
+}
+
+export interface DashboardMetric {
+  label: string
+  value: string
+  unit?: string
+  delta?: string
+  deltaDirection?: 'up' | 'down' | 'flat'
+  spark: number[]
+  sparkTone?: 'accent' | 'signal'
+}
+
+export interface DashboardHistogramPoint {
+  label: string
+  count: number
+}
+
+export interface QuickStatusItem {
+  label: string
+  value: string
+  tone: 'neutral' | 'signal' | 'warn'
+}
+
+export interface RankedItem {
+  label: string
+  key: string
+  count: number
+  active?: boolean
+}
+
+export interface DashboardData {
+  isDerived: boolean
+  greeting: string
+  timestampLabel: string
+  metrics: DashboardMetric[]
+  histogram: DashboardHistogramPoint[]
+  quickStatus: QuickStatusItem[]
+  rankedList: RankedItem[]
+  recentLeads: Lead[]
 }

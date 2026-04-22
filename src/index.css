@@ -1,35 +1,56 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "JetBrains Mono", "Fira Code", Menlo, monospace;
+}
+
 :root {
-  --bg-canvas: #f3efe7;
-  --bg-soft: #fbf7f0;
-  --bg-panel: rgba(255, 255, 255, 0.92);
-  --bg-panel-strong: #ffffff;
-  --bg-sidebar: #11233a;
-  --bg-sidebar-alt: #0c1727;
-  --bg-accent-soft: rgba(188, 135, 47, 0.16);
-  --border-soft: rgba(17, 35, 58, 0.12);
-  --border-strong: rgba(17, 35, 58, 0.2);
-  --text-main: #11263d;
-  --text-muted: #596579;
-  --text-soft: #8a96a8;
-  --text-on-dark: #f4f7fb;
-  --accent: #bc872f;
-  --accent-strong: #9b6a1e;
-  --accent-deep: #7d5419;
-  --danger: #b24f32;
-  --focus-ring: rgba(188, 135, 47, 0.32);
-  font-family:
-    "Instrument Sans",
-    "Avenir Next",
-    "Segoe UI",
-    sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color: var(--text-main);
-  background: var(--bg-canvas);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --bg: #f6f4ef;
+  --surface: #fbfaf6;
+  --surface-2: #f0ede5;
+  --line: #e4e0d5;
+  --line-soft: #ece8de;
+  --ink: #1a1813;
+  --ink-muted: #5a5649;
+  --ink-faint: #908b7b;
+  --accent: oklch(0.48 0.09 260);
+  --accent-soft: oklch(0.92 0.03 260);
+  --accent-ink: oklch(0.28 0.06 260);
+  --signal: oklch(0.58 0.11 155);
+  --signal-bg: oklch(0.94 0.04 155);
+  --warn: oklch(0.62 0.13 65);
+  --warn-bg: oklch(0.94 0.05 65);
+  --danger: oklch(0.55 0.16 25);
+  --code-bg: #f0ede5;
+  --code-key: oklch(0.42 0.09 260);
+  --code-str: oklch(0.45 0.1 155);
+  --code-num: oklch(0.52 0.14 65);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme='dark'] {
+  --bg: #121110;
+  --surface: #1a1815;
+  --surface-2: #232019;
+  --line: #2e2a22;
+  --line-soft: #252218;
+  --ink: #f0ede4;
+  --ink-muted: #9a9383;
+  --ink-faint: #625c50;
+  --accent: oklch(0.72 0.09 260);
+  --accent-soft: oklch(0.28 0.05 260);
+  --accent-ink: oklch(0.85 0.06 260);
+  --signal: oklch(0.72 0.12 155);
+  --signal-bg: oklch(0.28 0.05 155);
+  --warn: oklch(0.75 0.13 65);
+  --warn-bg: oklch(0.3 0.05 65);
+  --danger: oklch(0.68 0.16 25);
+  --code-bg: #0e0d0b;
+  --code-key: oklch(0.78 0.08 260);
+  --code-str: oklch(0.74 0.1 155);
+  --code-num: oklch(0.78 0.12 65);
 }
 
 * {
@@ -44,10 +65,13 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(188, 135, 47, 0.14), transparent 28%),
-    linear-gradient(180deg, #faf7f1 0%, var(--bg-canvas) 100%);
-  color: var(--text-main);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body,
@@ -68,8 +92,9 @@ textarea {
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
-textarea:focus-visible {
-  box-shadow: 0 0 0 3px var(--focus-ring);
+textarea:focus-visible,
+a:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
 #root {
@@ -78,16 +103,49 @@ textarea:focus-visible {
 
 a {
   color: inherit;
-}
-
-p {
-  margin: 0;
+  text-decoration: none;
 }
 
 h1,
 h2,
 h3,
 h4,
-strong {
+strong,
+p {
+  margin: 0;
   overflow-wrap: anywhere;
+}
+
+input,
+select,
+textarea {
+  /* border: 0; */
+  background: transparent;
+  color: inherit;
+}
+
+/* SVG logo */
+.logo-fill { fill: var(--ink); }
+.logo-cut { stroke: var(--bg); fill: none; }
+.logo-cut.soft { fill: var(--bg); opacity: 0.7; stroke: none; }
+
+/* Sparkline SVG */
+.sparkline-accent { stroke: var(--accent); fill: var(--accent); }
+.sparkline-signal { stroke: var(--signal); fill: var(--signal); }
+.sparkline polyline,
+.sparkline circle { stroke-width: 1.4; }
+
+/* Code syntax */
+.code-key { color: var(--code-key); }
+.code-value { color: var(--code-str); }
+
+/* Responsive sidebar auto-collapse */
+@media (max-width: 1120px) {
+  .sidebar { width: 64px !important; }
+  .sidebar .sidebar-brand { justify-content: center; padding: 0; }
+  .sidebar .sidebar-collapsible { display: none; }
+  .sidebar .sidebar-link { justify-content: center; padding: 8px 0; }
+  .sidebar .sidebar-user { justify-content: center; }
+  .sidebar .sidebar-footer { padding: 10px 6px; }
+  .sidebar .sidebar-nav { padding: 10px 6px; }
 }
