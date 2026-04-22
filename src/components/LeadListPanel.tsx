@@ -185,8 +185,8 @@ function LeadListPanel({
     : 'grid-cols-[68px_1.3fr_2fr_110px]'
 
   return (
-    <section className="flex flex-col gap-4.5 min-h-0">
-      <div className="flex items-center gap-2.5 border-b border-(--line) bg-(--surface) px-7 py-3 -mt-5.5 -mx-7">
+    <section className="flex-1 flex flex-col min-h-0">
+      <div className="flex items-center gap-2.5 border-b border-(--line) bg-(--surface) px-7 py-3 shrink-0">
         {isAdmin ? (
           <FilterChip label="Client">
             <select

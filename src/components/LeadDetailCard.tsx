@@ -73,7 +73,7 @@ function LeadDetailCard({ lead, isLoading, onBack }: LeadDetailCardProps) {
 
   if (isLoading) {
     return (
-      <section className="flex flex-col gap-4.5 px-7 pt-5.5 pb-7 min-h-0">
+      <section className="flex-1 flex flex-col gap-4.5 px-7 pt-5.5 pb-7 min-h-0">
         <div className="flex flex-col gap-1.5 border border-(--line) rounded-[10px] bg-(--surface) p-6 text-(--ink-muted)">
           <h3 className="text-(--ink) text-lg font-medium">Loading lead detail…</h3>
           <p>Fetching the latest record from `/api/leads/{'{id}'}`.</p>
@@ -84,7 +84,7 @@ function LeadDetailCard({ lead, isLoading, onBack }: LeadDetailCardProps) {
 
   if (!lead) {
     return (
-      <section className="flex flex-col gap-4.5 px-7 pt-5.5 pb-7 min-h-0">
+      <section className="flex-1 flex flex-col gap-4.5 px-7 pt-5.5 pb-7 min-h-0">
         <div className="flex flex-col gap-1.5 border border-(--line) rounded-[10px] bg-(--surface) p-6 text-(--ink-muted)">
           <h3 className="text-(--ink) text-lg font-medium">Select a lead.</h3>
           <p>Lead details will appear here after you pick a record from the list.</p>
@@ -106,7 +106,7 @@ function LeadDetailCard({ lead, isLoading, onBack }: LeadDetailCardProps) {
   }
 
   return (
-    <section className="flex flex-col gap-4.5 px-7 pt-5.5 pb-7 min-h-0">
+    <section className="flex-1 flex flex-col gap-4.5 px-7 pt-5.5 pb-7 min-h-0">
       <div className="min-h-0 grid grid-cols-[1fr_420px] max-[1220px]:grid-cols-1">
         <div className="min-h-0 flex flex-col gap-4.5 overflow-auto pr-4.5 max-[1220px]:pr-0">
 

@@ -90,7 +90,7 @@ function DashboardRecentRow({
 function DashboardView({ activeUser, dashboardData, onLeadOpen }: DashboardViewProps) {
   if (!dashboardData) {
     return (
-      <section className="flex flex-col gap-4.5 px-7 pt-5.5 pb-7 min-h-0">
+      <section className="flex-1 flex flex-col gap-4.5 px-7 pt-5.5 pb-7">
         <div className="flex flex-col gap-1.5 border border-(--line) rounded-[10px] bg-(--surface) p-6 text-(--ink-muted)">
           <h3 className="text-(--ink) text-lg font-medium">Loading dashboard…</h3>
           <p>Building derived metrics from the visible lead scope.</p>
@@ -103,7 +103,7 @@ function DashboardView({ activeUser, dashboardData, onLeadOpen }: DashboardViewP
   const maxHistogram = Math.max(...dashboardData.histogram.map((point) => point.count), 1)
 
   return (
-    <section className="flex flex-col gap-4.5 px-7 pt-5.5 pb-7 min-h-0">
+    <section className="flex-1 overflow-auto flex flex-col gap-4.5 px-7 pt-5.5 pb-7">
       <div className="flex items-end justify-between gap-5">
         <div>
           <h1 className="text-[22px] font-medium tracking-[-0.5px]">
@@ -135,7 +135,7 @@ function DashboardView({ activeUser, dashboardData, onLeadOpen }: DashboardViewP
         ))}
       </div>
 
-      <div className="grid grid-cols-[1.8fr_1fr] gap-3.5 min-h-0 max-[1200px]:grid-cols-1">
+      <div className="grid grid-cols-[1.8fr_1fr] gap-3.5 max-[1200px]:grid-cols-1">
         <section className="border border-(--line) rounded-lg bg-(--surface) p-4.5">
           <div className="flex items-center justify-between gap-4 mb-4">
             <div>
@@ -213,7 +213,7 @@ function DashboardView({ activeUser, dashboardData, onLeadOpen }: DashboardViewP
         </section>
       </div>
 
-      <div className="grid grid-cols-[1fr_1.8fr] gap-3.5 min-h-0 max-[1200px]:grid-cols-1">
+      <div className="grid grid-cols-[1fr_1.8fr] gap-3.5 max-[1200px]:grid-cols-1">
         <section className="border border-(--line) rounded-lg bg-(--surface) p-4.5">
           <div className="flex items-center justify-between gap-4 mb-4">
             <div>

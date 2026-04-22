@@ -213,7 +213,7 @@ function App() {
   const currentNav: NavKey = route.name === 'dashboard' ? 'dashboard' : 'leads'
 
   return (
-    <div className="min-h-screen flex bg-(--bg) text-(--ink)">
+    <div className="h-screen flex bg-(--bg) text-(--ink)">
       <Sidebar
         collapsed={sidebarCollapsed}
         current={currentNav}
@@ -225,7 +225,7 @@ function App() {
         user={authState.user}
       />
 
-      <div className="min-w-0 flex-1 flex flex-col">
+      <div className="min-w-0 flex-1 flex flex-col min-h-0">
         <Topbar
           crumbs={topbarCrumbs}
           onLogout={handleLogout}
