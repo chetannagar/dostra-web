@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Dostra · Frontend Design</title>
+<meta name="viewport" content="width=1600"/>
+<style>html,body{margin:0;padding:0;background:#f0eee9;overflow:hidden}</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="tokens.jsx"></script>
+<script type="text/babel" src="shell.jsx"></script>
+<script type="text/babel" src="login.jsx"></script>
+<script type="text/babel" src="dashboard.jsx"></script>
+<script type="text/babel" src="leads.jsx"></script>
+<script type="text/babel" src="detail.jsx"></script>
+
+<script type="text/babel">
+
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "theme": "light",
+  "sidebar": "expanded",
+  "role": "admin"
+}/*EDITMODE-END*/;
+
+function App() {
+  const [theme, setTheme] = React.useState(TWEAKS.theme);
+  const [sidebar, setSidebar] = React.useState(TWEAKS.sidebar);
+  const [role, setRole] = React.useState(TWEAKS.role || 'admin');
+  const [editMode, setEditMode] = React.useState(false);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const d = e.data || {};
+      if (d.type === '__activate_edit_mode')   setEditMode(true);
+      if (d.type === '__deactivate_edit_mode') setEditMode(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const persist = (edits) => { window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*'); };
+
+  const t = theme === 'dark' ? DOSTRA_DARK : DOSTRA_LIGHT;
+  const collapsed = sidebar === 'collapsed';
+  const admin      = { name: 'Chetan Nagar', role: 'admin' };
+  const clientUser = { name: 'Priya Patel',  role: 'client', clients: [{ name: 'Acme Plumbing', key: 'acme_plumbing' }] };
+  const current = role === 'admin' ? admin : clientUser;
+
+  const withShell = (content, cur, u) => (
+    <div style={{ display: 'flex', width: 1440, height: 900, background: t.bg }}>
+      <Sidebar t={t} collapsed={collapsed} current={cur} user={u}
+        onToggle={() => { const n = collapsed ? 'expanded' : 'collapsed'; setSidebar(n); persist({ sidebar: n }); }}
+        onNav={() => {}} />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>{content}</div>
+    </div>
+  );
+
+  return (
+    <>
+      <DesignCanvas>
+        <DCSection id="overview" title={`Dostra · ${role === 'admin' ? 'Admin view' : 'Client view'}`} subtitle={role === 'admin' ? 'Sees all clients · all leads · cross-client signals' : 'Sees only assigned client(s) · scoped metrics, filters & breadcrumbs'}>
+          <DCArtboard id="login"     label="01 · Login"        width={1440} height={900}><LoginScreen t={t} /></DCArtboard>
+          <DCArtboard id="dashboard" label="02 · Dashboard"    width={1440} height={900}>{withShell(<DashboardScreen t={t} user={current}/>, 'dashboard', current)}</DCArtboard>
+          <DCArtboard id="leads"     label="03 · Leads list"   width={1440} height={900}>{withShell(<LeadsListScreen t={t} user={current}/>, 'leads', current)}</DCArtboard>
+          <DCArtboard id="detail"    label="04 · Lead detail"  width={1440} height={900}>{withShell(<LeadDetailScreen t={t} user={current}/>, 'leads', current)}</DCArtboard>
+        </DCSection>
+
+        <DCSection id="admin-row" title="Admin · all clients" subtitle="Full visibility across every assigned client">
+          <DCArtboard id="a-dash"  label="Admin · Dashboard"   width={1440} height={900}>{withShell(<DashboardScreen t={t} user={admin}/>, 'dashboard', admin)}</DCArtboard>
+          <DCArtboard id="a-leads" label="Admin · Leads"       width={1440} height={900}>{withShell(<LeadsListScreen t={t} user={admin}/>, 'leads', admin)}</DCArtboard>
+          <DCArtboard id="a-det"   label="Admin · Lead detail" width={1440} height={900}>{withShell(<LeadDetailScreen t={t} user={admin}/>, 'leads', admin)}</DCArtboard>
+        </DCSection>
+
+        <DCSection id="client-row" title="Client · assigned only" subtitle="Same shell, scoped to one client · Clients/Users nav hidden">
+          <DCArtboard id="c-dash"  label="Client · Dashboard"   width={1440} height={900}>{withShell(<DashboardScreen t={t} user={clientUser}/>, 'dashboard', clientUser)}</DCArtboard>
+          <DCArtboard id="c-leads" label="Client · Leads"       width={1440} height={900}>{withShell(<LeadsListScreen t={t} user={clientUser}/>, 'leads', clientUser)}</DCArtboard>
+          <DCArtboard id="c-det"   label="Client · Lead detail" width={1440} height={900}>{withShell(<LeadDetailScreen t={t} user={clientUser}/>, 'leads', clientUser)}</DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+
+      {editMode && (
+        <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 200, background: t.surface, border: `1px solid ${t.line}`, borderRadius: 10, padding: 14, minWidth: 260, boxShadow: '0 8px 32px rgba(0,0,0,.12)', fontFamily: DOSTRA_TYPE.sans, color: t.ink }}>
+          <div style={{ fontSize: 12, fontFamily: DOSTRA_TYPE.mono, color: t.inkFaint, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>Tweaks</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <TweakRow label="Role">
+              <Seg t={t} opts={[{v:'admin',l:'Admin'},{v:'client',l:'Client'}]} value={role} onChange={(v) => { setRole(v); persist({ role: v }); }}/>
+            </TweakRow>
+            <TweakRow label="Theme">
+              <Seg t={t} opts={[{v:'light',l:<><Icon name="sun" size={12}/> Light</>},{v:'dark',l:<><Icon name="moon" size={12}/> Dark</>}]} value={theme} onChange={(v) => { setTheme(v); persist({ theme: v }); }}/>
+            </TweakRow>
+            <TweakRow label="Sidebar">
+              <Seg t={t} opts={[{v:'expanded',l:'Expanded'},{v:'collapsed',l:'Collapsed'}]} value={sidebar} onChange={(v) => { setSidebar(v); persist({ sidebar: v }); }}/>
+            </TweakRow>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function TweakRow({ label, children }) {
+  return (<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}><div style={{ fontSize: 12.5 }}>{label}</div><div>{children}</div></div>);
+}
+function Seg({ t, opts, value, onChange }) {
+  return (
+    <div style={{ display: 'inline-flex', background: t.surface2, border: `1px solid ${t.line}`, borderRadius: 6, padding: 2, gap: 2 }}>
+      {opts.map(o => (
+        <button key={o.v} onClick={() => onChange(o.v)} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', border: 'none', borderRadius: 4,
+          background: o.v === value ? t.surface : 'transparent', color: o.v === value ? t.ink : t.inkMuted,
+          fontFamily: DOSTRA_TYPE.sans, fontSize: 12, cursor: 'pointer',
+          boxShadow: o.v === value ? '0 1px 2px rgba(0,0,0,.08)' : 'none',
+        }}>{o.l}</button>
+      ))}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
