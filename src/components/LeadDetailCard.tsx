@@ -155,7 +155,7 @@ function LeadDetailCard({ lead, isLoading, onBack }: LeadDetailCardProps) {
                   Copy email
                 </button>
                 <a
-                  className="inline-flex items-center justify-center gap-1.5 rounded-md border border-(--ink) bg-(--ink) text-(--bg) cursor-pointer px-3.5 py-2.5 transition-all duration-180 ease-in-out"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-md border border-(--line) bg-(--surface) text-(--ink-muted) cursor-pointer px-2.75 py-2 transition-all duration-180 ease-in-out"
                   href={lead.email ? `mailto:${lead.email}` : undefined}
                 >
                   Reply via email <Icon name="external" size={12} />
