@@ -11,7 +11,7 @@ import {
 
 interface LeadListPanelProps {
   activeUser: User
-  availableClients: Array<{ key: string; label: string }>
+  availableClients: Array<{ id: number; key: string; label: string }>
   filters: LeadFilters
   isLoading: boolean
   onFilterChange: (next: LeadFilters) => void
@@ -197,7 +197,7 @@ function LeadListPanel({
             >
               <option value="">All clients</option>
               {availableClients.map((client) => (
-                <option key={client.key} value={client.key}>
+                <option key={client.key} value={String(client.id)}>
                   {client.label}
                 </option>
               ))}

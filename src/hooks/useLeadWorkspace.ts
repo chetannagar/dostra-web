@@ -315,15 +315,16 @@ export function useLeadWorkspace({
   const availableClients = useMemo(() => {
     if (user?.role === 'client') {
       return user.clients.map((client) => ({
+        id: client.id,
         key: client.client_key,
         label: client.name,
       }))
     }
 
-    const deduped = new Map<string, { label: string; key: string }>()
+    const deduped = new Map<string, { id: number; label: string; key: string }>()
     for (const lead of leads) {
       if (!deduped.has(lead.clientKey)) {
-        deduped.set(lead.clientKey, { label: lead.clientName, key: lead.clientKey })
+        deduped.set(lead.clientKey, { id: lead.clientId, label: lead.clientName, key: lead.clientKey })
       }
     }
 
