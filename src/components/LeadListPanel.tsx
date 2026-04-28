@@ -52,7 +52,7 @@ function PreviewCode({ lead }: { lead: Lead }) {
       ]
 
   return (
-    <pre className="min-h-0 flex-1 overflow-auto border border-(--line) rounded-md bg-(--code-bg) p-3 text-(--ink-muted) font-mono text-[11.5px] leading-[1.65]">
+    <pre className="overflow-auto border border-(--line) rounded-md bg-(--code-bg) p-3 text-(--ink-muted) font-mono text-[11.5px] leading-[1.65]">
       <span>{'{'}</span>
       {fallbackEntries.map(([key, value], index) => (
         <span key={key} className="block pl-3.5">
@@ -136,7 +136,7 @@ function LeadPreview({
         </div>
       </section>
 
-      <section className="min-h-0 flex-1 flex flex-col border-t border-(--line) px-5.5 py-4">
+      <section className="flex flex-col border-t border-(--line) px-5.5 py-4">
         <div className="flex items-center justify-between gap-3 mb-2">
           <p className="font-mono tabular-nums text-[10.5px] uppercase tracking-[0.8px] text-(--ink-muted)">
             Payload · preview
