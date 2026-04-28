@@ -229,8 +229,12 @@ function App() {
         <Topbar
           crumbs={topbarCrumbs}
           onLogout={handleLogout}
+          onSearch={(query) => {
+            setLeadFilters({ ...leadFilters, search: query, page: 1 })
+          }}
           onThemeToggle={() => setThemeMode((current) => (current === 'light' ? 'dark' : 'light'))}
           right={shellAction}
+          searchQuery={leadFilters.search}
           themeMode={themeMode}
           user={authState.user}
         />

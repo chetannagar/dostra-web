@@ -1,17 +1,47 @@
-import type { ReactNode } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import Icon from './Icon.tsx'
 import type { User, ThemeMode } from '../types/types.ts'
 
 interface TopbarProps {
   crumbs: string[]
   onLogout: () => void
+  onSearch: (query: string) => void
   onThemeToggle: () => void
   right?: ReactNode
+  searchQuery: string
   themeMode: ThemeMode
   user: User
 }
 
-function Topbar({ crumbs, onLogout, onThemeToggle, right, themeMode, user }: TopbarProps) {
+function Topbar({ crumbs, onLogout, onSearch, onThemeToggle, right, searchQuery, themeMode, user }: TopbarProps) {
+  const [inputValue, setInputValue] = useState(searchQuery)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    setInputValue(searchQuery)
+  }, [searchQuery])
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        inputRef.current?.focus()
+        inputRef.current?.select()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  function handleChange(value: string) {
+    setInputValue(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      onSearch(value)
+    }, 300)
+  }
+
   return (
     <header className="flex items-center gap-4 h-14 border-b border-(--line) bg-(--surface) px-5">
       <div className="min-w-0 flex items-center gap-2">
@@ -35,13 +65,15 @@ function Topbar({ crumbs, onLogout, onThemeToggle, right, themeMode, user }: Top
         <label className="w-[min(100%,420px)] flex items-center gap-2 border border-(--line) rounded-md bg-(--surface-2) text-(--ink-faint) px-2.5 py-1.5">
           <Icon name="search" size={14} />
           <input
-            className="min-w-0 flex-1 text-[13px] text-(--ink) placeholder:text-(--ink-faint)"
+            ref={inputRef}
+            className="min-w-0 flex-1 text-[13px] text-(--ink) placeholder:text-(--ink-faint) focus-visible:shadow-none"
+            onChange={(e) => handleChange(e.target.value)}
             placeholder="Search leads, clients, payloads…"
-            readOnly
             type="search"
+            value={inputValue}
           />
           <kbd className="border border-(--line) rounded-[3px] bg-(--surface) text-(--ink-faint) px-1.25 py-px font-mono text-[10.5px]">
-            ⌘K
+            ⌘ + K
           </kbd>
         </label>
       </div>
