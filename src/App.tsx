@@ -3,6 +3,7 @@ import { buildLeadSearch, defaultFilters, getCurrentLocation, navigateTo, parseL
 import { getStoredSidebarCollapsed, getStoredThemeMode, setStoredSidebarCollapsed, setStoredThemeMode } from './utils/storage.ts'
 import { useAuthSession } from './hooks/useAuthSession.ts'
 import { useLeadWorkspace } from './hooks/useLeadWorkspace.ts'
+import { getClients } from './services/api.ts'
 import type { LeadFilters, NavKey, ThemeMode } from './types/types.ts'
 import Sidebar from './components/Sidebar.tsx'
 import Topbar from './components/Topbar.tsx'
@@ -28,6 +29,7 @@ function App() {
   const [locationState, setLocationState] = useState(getCurrentLocation)
   const [themeMode, setThemeMode] = useState<ThemeMode>(getStoredThemeMode)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(getStoredSidebarCollapsed)
+  const [totalClientCount, setTotalClientCount] = useState<number | null>(null)
   const {
     authState,
     clearSession,
@@ -60,6 +62,11 @@ function App() {
   useEffect(() => {
     setStoredSidebarCollapsed(sidebarCollapsed)
   }, [sidebarCollapsed])
+
+  useEffect(() => {
+    if (authState.user?.role !== 'admin') return
+    getClients().then((clients) => setTotalClientCount(clients.length)).catch(() => {})
+  }, [authState.user])
 
   const effectivePathname = !authState.user
     ? '/login'
@@ -227,6 +234,7 @@ function App() {
 
       <div className="min-w-0 flex-1 flex flex-col min-h-0">
         <Topbar
+          clientCount={totalClientCount}
           crumbs={topbarCrumbs}
           onLogout={handleLogout}
           onSearch={(query) => {

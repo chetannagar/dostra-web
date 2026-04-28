@@ -185,8 +185,8 @@ export async function getLead(leadId: number) {
 }
 
 export async function getClients() {
-  const response = await request<ApiClientSummary[]>('/clients')
-  return response satisfies ClientSummary[]
+  const response = await request<{ data: ApiClientSummary[] }>('/clients')
+  return response.data satisfies ClientSummary[]
 }
 
 export async function getUsers() {

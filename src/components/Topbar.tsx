@@ -3,6 +3,7 @@ import Icon from './Icon.tsx'
 import type { User, ThemeMode } from '../types/types.ts'
 
 interface TopbarProps {
+  clientCount: number | null
   crumbs: string[]
   onLogout: () => void
   onSearch: (query: string) => void
@@ -13,7 +14,7 @@ interface TopbarProps {
   user: User
 }
 
-function Topbar({ crumbs, onLogout, onSearch, onThemeToggle, right, searchQuery, themeMode, user }: TopbarProps) {
+function Topbar({ clientCount, crumbs, onLogout, onSearch, onThemeToggle, right, searchQuery, themeMode, user }: TopbarProps) {
   const [inputValue, setInputValue] = useState(searchQuery)
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -85,7 +86,7 @@ function Topbar({ crumbs, onLogout, onSearch, onThemeToggle, right, searchQuery,
           {user.role === 'admin' ? (
             <span>
               All clients ·{' '}
-              <span className="font-mono tabular-nums">{Math.max(user.clients.length, 1)}</span>
+              <span className="font-mono tabular-nums">{clientCount ?? '—'}</span>
             </span>
           ) : (
             <span>
